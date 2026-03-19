@@ -81,12 +81,12 @@ document.addEventListener('DOMContentLoaded', () => {
             p.x += p.vx;
             p.y += p.vy;
             
-            // Boundary constraints
-            if (p.x < PARTICLE_RADIUS) { p.x = PARTICLE_RADIUS; p.vx *= -0.3; }
-            else if (p.x > canvas.width - PARTICLE_RADIUS) { p.x = canvas.width - PARTICLE_RADIUS; p.vx *= -0.3; }
+            // Boundary constraints (Zero bounce, high friction for sand)
+            if (p.x < PARTICLE_RADIUS) { p.x = PARTICLE_RADIUS; p.vx = 0; p.vy *= 0.8; }
+            else if (p.x > canvas.width - PARTICLE_RADIUS) { p.x = canvas.width - PARTICLE_RADIUS; p.vx = 0; p.vy *= 0.8; }
             
-            if (p.y < PARTICLE_RADIUS) { p.y = PARTICLE_RADIUS; p.vy *= -0.3; }
-            else if (p.y > canvas.height - PARTICLE_RADIUS) { p.y = canvas.height - PARTICLE_RADIUS; p.vy *= -0.3; }
+            if (p.y < PARTICLE_RADIUS) { p.y = PARTICLE_RADIUS; p.vy = 0; p.vx *= 0.8; }
+            else if (p.y > canvas.height - PARTICLE_RADIUS) { p.y = canvas.height - PARTICLE_RADIUS; p.vy = 0; p.vx *= 0.8; }
             
             // Hash position
             let col = Math.max(0, Math.min(gridCols - 1, Math.floor(p.x / GRID_SIZE)));
@@ -132,8 +132,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                     p1.x -= pushX; p1.y -= pushY;
                                     p2.x += pushX; p2.y += pushY;
                                     
-                                    p1.vx -= pushX * 0.5; p1.vy -= pushY * 0.5;
-                                    p2.vx += pushX * 0.5; p2.vy += pushY * 0.5;
+                                    // Kill the "spazzing" by removing artificial bounce.
+                                    // Apply friction/damping to settle the sand heavily.
+                                    p1.vx *= 0.85; p1.vy *= 0.85;
+                                    p2.vx *= 0.85; p2.vy *= 0.85;
                                 }
                             }
                             j = next[j];
@@ -146,9 +148,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // 3. Pointer Interactions
         if (pointer.active) {
             if (currentMode === 'ADD') {
-                for (let i = 0; i < 5; i++) {
+                for (let i = 0; i < 25; i++) { // <--- Increased from 5 to 25 per frame
                     if (particles.length < MAX_PARTICLES) {
-                        particles.push(new Particle(pointer.x + (Math.random()-0.5)*10, pointer.y + (Math.random()-0.5)*10));
+                        particles.push(new Particle(pointer.x + (Math.random()-0.5)*30, pointer.y + (Math.random()-0.5)*30));
                     }
                 }
             } else if (currentMode === 'REMOVE') {
