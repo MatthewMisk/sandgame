@@ -132,10 +132,25 @@ document.addEventListener('DOMContentLoaded', () => {
                                     p1.x -= pushX; p1.y -= pushY;
                                     p2.x += pushX; p2.y += pushY;
                                     
-                                    // Kill the "spazzing" by removing artificial bounce.
-                                    // Apply friction/damping to settle the sand heavily.
-                                    p1.vx *= 0.85; p1.vy *= 0.85;
-                                    p2.vx *= 0.85; p2.vy *= 0.85;
+                                    // Calculate relative velocity
+                                    let rvx = p2.vx - p1.vx;
+                                    let rvy = p2.vy - p1.vy;
+                                    let velAlongNormal = rvx * nx + rvy * ny;
+                                    
+                                    // Only apply physics if they are crashing into each other
+                                    if (velAlongNormal < 0) {
+                                        // Inelastic collision (zero bounce)
+                                        let impulse = -velAlongNormal * 0.5;
+                                        let ix = nx * impulse;
+                                        let iy = ny * impulse;
+                                        
+                                        p1.vx -= ix; p1.vy -= iy;
+                                        p2.vx += ix; p2.vy += iy;
+                                        
+                                        // Micro-friction to help sand lock together and pile up naturally
+                                        p1.vx *= 0.99; p1.vy *= 0.99;
+                                        p2.vx *= 0.99; p2.vy *= 0.99;
+                                    }
                                 }
                             }
                             j = next[j];
