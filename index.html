@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gravity Sand</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#111111">
+</head>
+<body>
+    <canvas id="sand-canvas"></canvas>
+    
+    <div id="ui-layer">
+        <div class="top-bar">
+            <div id="menu-container" class="hidden">
+                <button id="btn-toggle-menu" class="btn semi-transparent" aria-label="Toggle Menu">⚙️</button>
+                <div id="action-menu" class="hidden">
+                    <button id="btn-mode-add" class="btn mode-btn">➕ Add Sand</button>
+                    <button id="btn-mode-remove" class="btn mode-btn">➖ Remove Sand</button>
+                    <button id="btn-mode-play" class="btn mode-btn active">🖐️ Play / Push</button>
+                </div>
+            </div>
+            <button id="btn-reset" class="btn hidden">Reset</button>
+        </div>
+        
+        <button id="btn-start" class="btn primary">Start Gravity (Enable Sensors)</button>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(() => console.log('Offline Survival Mode: Activated.'))
+                    .catch(err => console.error('SW Registration failed:', err));
+            });
+        }
+    </script>
+</body>
+</html>
