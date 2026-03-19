@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnModePlay = document.getElementById('btn-mode-play');
 
     // Physics Constants
-    const MAX_PARTICLES = 5000;
+    const MAX_PARTICLES = 30000; // <--- CHANGED: Raised limit for massive amounts of sand
     const PARTICLE_RADIUS = 2;
     const GRID_SIZE = PARTICLE_RADIUS * 2;
     
