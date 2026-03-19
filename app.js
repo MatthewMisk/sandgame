@@ -82,11 +82,15 @@ document.addEventListener('DOMContentLoaded', () => {
             p.y += p.vy;
             
             // Boundary constraints (Zero bounce, high friction for sand)
-            if (p.x < PARTICLE_RADIUS) { p.x = PARTICLE_RADIUS; p.vx = 0; p.vy *= 0.8; }
-            else if (p.x > canvas.width - PARTICLE_RADIUS) { p.x = canvas.width - PARTICLE_RADIUS; p.vx = 0; p.vy *= 0.8; }
+            if (p.x < PARTICLE_RADIUS) { p.x = PARTICLE_RADIUS; p.vx = 0; p.vy *= 0.6; }
+            else if (p.x > canvas.width - PARTICLE_RADIUS) { p.x = canvas.width - PARTICLE_RADIUS; p.vx = 0; p.vy *= 0.6; }
             
-            if (p.y < PARTICLE_RADIUS) { p.y = PARTICLE_RADIUS; p.vy = 0; p.vx *= 0.8; }
-            else if (p.y > canvas.height - PARTICLE_RADIUS) { p.y = canvas.height - PARTICLE_RADIUS; p.vy = 0; p.vx *= 0.8; }
+            if (p.y < PARTICLE_RADIUS) { p.y = PARTICLE_RADIUS; p.vy = 0; p.vx *= 0.6; }
+            else if (p.y > canvas.height - PARTICLE_RADIUS) { p.y = canvas.height - PARTICLE_RADIUS; p.vy = 0; p.vx *= 0.6; }
+
+            // SLEEP LOGIC: Kill micro-movements to prevent "spazzing"
+            if (Math.abs(p.vx) < 0.05) p.vx = 0;
+            if (Math.abs(p.vy) < 0.05) p.vy = 0;
             
             // Hash position
             let col = Math.max(0, Math.min(gridCols - 1, Math.floor(p.x / GRID_SIZE)));
@@ -123,6 +127,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                 if (distSq < minDist * minDist && distSq > 0) {
                                     let dist = Math.sqrt(distSq);
                                     let overlap = minDist - dist;
+                                    
+                                    // ADDING SLOP: Only resolve if overlap is significant.
+                                    // This prevents the "boiling/spazzing" effect in piles.
+                                    if (overlap < 0.1) { j = next[j]; continue; }
+
                                     let nx = dx / dist;
                                     let ny = dy / dist;
                                     
@@ -147,9 +156,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                         p1.vx -= ix; p1.vy -= iy;
                                         p2.vx += ix; p2.vy += iy;
                                         
-                                        // Micro-friction to help sand lock together and pile up naturally
-                                        p1.vx *= 0.99; p1.vy *= 0.99;
-                                        p2.vx *= 0.99; p2.vy *= 0.99;
+                                        // Stronger friction during contact to create stable piles
+                                        p1.vx *= 0.92; p1.vy *= 0.92;
+                                        p2.vx *= 0.92; p2.vy *= 0.92;
                                     }
                                 }
                             }
